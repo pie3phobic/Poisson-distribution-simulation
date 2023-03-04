@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Poisson Distribution</title>
+  </head>
+  <body>
+    <main>
+      <section class="player player--0 player--active">
+        <div class="chartBox">
+          <canvas id="myChart"></canvas>
+        </div>
+      </section>
+      <p class="rolledNum">Random numbers generated:</p>
+      <p class="main-text">Poisson Distribution Generator</p>
+      <button class="btn btn--100roll">100 random numbers!</button>
+      <button class="btn btn--1000roll">1000 random numbers!</button>
+      <button class="btn btn--frequency">Statistics</button>
+      <button class="btn btn--new">🔄 Restart</button>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      const btnRoll = document.querySelector(".btn--roll");
+      const btn100Roll = document.querySelector(".btn--100roll");
+      const btn1000Roll = document.querySelector(".btn--1000roll");
+      const btnFrequency = document.querySelector(".btn--frequency");
+      const btnNew = document.querySelector(".btn--new");
+      const diceEl = document.querySelector(".cube");
+      let numOfRolls = 0;
+      //
+      let my_labels = [];
+      let norm_num = [];
+      let r_nums = [];
+      const ctx = document.getElementById("myChart").getContext("2d");
+      const myChart = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: [],
+          datasets: [
+            {
+              label: "# of Rolls",
+              data: [
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0, 0,
+              ],
+              backgroundColor: [
+                "rgba(255, 99, 132, 0.2)",
+                "rgba(54, 162, 235, 0.2)",
+                "rgba(255, 206, 86, 0.2)",
+                "rgba(75, 192, 192, 0.2)",
+                "rgba(153, 102, 255, 0.2)",
+                "rgba(255, 159, 64, 0.2)",
+              ],
+              borderColor: [
+                "rgba(255, 99, 132, 1)",
+                "rgba(54, 162, 235, 1)",
+                "rgba(255, 206, 86, 1)",
+                "rgba(75, 192, 192, 1)",
+                "rgba(153, 102, 255, 1)",
+                "rgba(255, 159, 64, 1)",
+              ],
+              borderWidth: 1,
+              barPercentage: 1,
+              categoryPercentage: 1,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+        },
+      });
+      btn100Roll.addEventListener("click", function () {
+        for (let i = 1; i <= 100; i++) {
+          my_labels.push(poissonRandomNumber(19));
+        }
+        //console.log(my_labels);
+        let uniqueLabels = my_labels.filter((x, i, a) => a.indexOf(x) == i);
+        //console.log(uniqueLabels);
+        uniqueLabels = uniqueLabels.sort(function (a, b) {
+          return a - b;
+        });
+        //console.log(uniqueLabels);
+        for (let m = 0; m < uniqueLabels.length; m++) {
+          myChart.config.data.labels[m] = uniqueLabels[m];
+        }
+        myChart.update();
+        for (let j = 0; j < my_labels.length; j++) {
+          if (myChart.data.labels.includes(my_labels.at(j))) {
+            let index = myChart.data.labels.indexOf(my_labels.at(j));
+            myChart.config.data.datasets[0].data[index] += 1;
+          }
+          myChart.update();
+        }
+        myChart.update();
+        numOfRolls += 100;
+        document.querySelector(
+          ".rolledNum"
+        ).textContent = `Random numbers generated: ${numOfRolls}`;
+        //myChart.update();
+      });
+      btn1000Roll.addEventListener("click", function () {
+        for (let i = 1; i <= 1000; i++) {
+          my_labels.push(poissonRandomNumber(19));
+        }
+        //console.log(my_labels);
+        let uniqueLabels = my_labels.filter((x, i, a) => a.indexOf(x) == i);
+        //console.log(uniqueLabels);
+        uniqueLabels = uniqueLabels.sort(function (a, b) {
+          return a - b;
+        });
+        //console.log(uniqueLabels);
+        for (let m = 0; m < uniqueLabels.length; m++) {
+          myChart.config.data.labels[m] = uniqueLabels[m];
+        }
+        myChart.update();
+        for (let j = 0; j < my_labels.length; j++) {
+          if (myChart.data.labels.includes(my_labels.at(j))) {
+            let index = myChart.data.labels.indexOf(my_labels.at(j));
+            myChart.config.data.datasets[0].data[index] += 1;
+          }
+          myChart.update();
+        }
+        myChart.update();
+        numOfRolls += 1000;
+        document.querySelector(
+          ".rolledNum"
+        ).textContent = `Random numbers generated: ${numOfRolls}`;
+        //myChart.update();
+      });
+      function poissonRandomNumber(lambda) {
+        var L = Math.exp(-lambda),
+          k = 0,
+          p = 0.1;
+        do {
+          k = k + 1;
+          p = p * Math.random();
+        } while (p > L);
+        return k - 1;
+      }
+      btnNew.addEventListener("click", function () {
+        numOfRolls = 0;
+        matSpodiv = 0;
+        variance = 0;
+        standartDev = 0;
+        document.querySelector(
+          ".rolledNum"
+        ).textContent = `Rolled Times: ${numOfRolls}`;
+        for (let k = 0; k <= 100; k++) {
+          myChart.config.data.datasets[0].data[k] = 0;
+        }
+        myChart.config.data.datasets[0].label = "# of Rolls";
+        myChart.update();
+      });
+      btnFrequency.addEventListener("click", function () {
+        let matSpodiv = 0;
+        let variance = 0;
+        let lambda = 19;
+        matSpodiv = lambda;
+        variance = lambda;
+        document.querySelector(
+          ".rolledNum"
+        ).textContent = `Random numbers generated: ${numOfRolls}\n\n
+         Mat.spodiv: ${matSpodiv}\n\n 
+         Variance: ${variance}\n\n`;
+
+        diceEl.style.visibility = "hidden";
+        console.log(`Mat spodiv: ${matSpodiv}`);
+        console.log(myChart.data.datasets[0].data);
+        console.log(`Variance: ${variance}`);
+        console.log(`Standart deviation: ${standartDev}`);
+      });
+    </script>
+  </body>
+</html>
